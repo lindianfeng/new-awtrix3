@@ -14,13 +14,13 @@ extern "C" {
 
 void awtrix_game_awtrix_says_start(void);
 void awtrix_game_slot_machine_start(void);
-void awtrix_game_tick(void);                  /* call every frame */
+void awtrix_game_tick(void); /* call every frame */
 bool awtrix_game_active(void);
 
 /* Controller input: a single line received from the TCP:8080 socket
  * (port matches the original AWTRIX3 ServerManager.cpp). The string is
  * routed to whichever game is currently active. */
-void awtrix_game_controller_input(const char *line);
+void awtrix_game_controller_input(const char* line);
 
 #ifdef __cplusplus
 }

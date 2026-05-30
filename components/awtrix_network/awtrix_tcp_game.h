@@ -13,7 +13,7 @@ void awtrix_tcp_game_start(uint16_t port);
 void awtrix_tcp_game_stop(void);
 
 /* Push a string to the currently-connected client (no-op when none). */
-void awtrix_tcp_game_send(const char *line);
+void awtrix_tcp_game_send(const char* line);
 
 #ifdef __cplusplus
 }

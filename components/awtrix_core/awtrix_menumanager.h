@@ -23,7 +23,7 @@ void awtrix_menu_select_short(void);
 void awtrix_menu_select_long(void);
 
 /* Returns the label for the currently selected menu entry (read-only). */
-const char* awtrix_menu_label(void);
+const char *awtrix_menu_label(void);
 
 #ifdef __cplusplus
 }

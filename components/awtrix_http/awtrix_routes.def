@@ -1,0 +1,84 @@
+/* awtrix_routes.def — single source of truth for HTTP routes.
+ *
+ * Each row defines one route as:
+ *   ROUTE(METHOD, "path", handler_function)
+ *
+ * The same row gets expanded three different ways from awtrix_api.cpp:
+ *   1. As a `static esp_err_t handler_function(httpd_req_t *)` forward
+ *      declaration.
+ *   2. As a `srv.onGet/onPost("path", handler_function);` registration
+ *      inside `awtrix_api_register_routes()`.
+ *   3. (Compile-time) as the constant in the "(N endpoints)" log line so
+ *      the count stays in sync with the table.
+ *
+ * To add a new endpoint:
+ *   - add one ROUTE() line here, in the right section (GET vs POST is
+ *     enforced by alphabetical-by-path within each section);
+ *   - add the handler body somewhere in awtrix_api.cpp.
+ *   That's it. The forward declaration, registration, and route count
+ *   are all generated.
+ *
+ * Auth: each row has a fifth `auth` flag (true = require Basic Auth).
+ * The current set is hand-curated to match what handlers actually do —
+ * auth-gated writes (settings/notify/custom/...) and reads of sensitive
+ * filesystem state (/list, /files), no auth on AP fallback (/setup,
+ * /scan, /connect) and public read-only telemetry (/api/stats etc.).
+ * The handlers still call awtrix_http_require_auth(req) themselves;
+ * the flag here is for documentation + future centralisation.
+ */
+
+/* ── GET ─────────────────────────────────────────────────────── */
+ROUTE(GET,  "/",                h_root,         false)
+ROUTE(GET,  "/version",         h_version,      false)
+ROUTE(GET,  "/api/loop",        h_loop,         false)
+ROUTE(GET,  "/api/effects",     h_effects,      false)
+ROUTE(GET,  "/api/transitions", h_transitions,  false)
+ROUTE(GET,  "/api/apps",        h_apps_get,     false)
+ROUTE(GET,  "/api/settings",    h_settings_get, false)
+ROUTE(GET,  "/api/stats",       h_stats,        false)
+ROUTE(GET,  "/api/screen",      h_screen,       false)
+ROUTE(GET,  "/fullscreen",      h_fullscreen,   false)
+/* Pack M: /screen returns the embedded-iframe HTML page (was missing
+ * from the IDF port); /api/screen above remains the raw-JSON pixel
+ * feed that both viewers poll. */
+ROUTE(GET,  "/screen",          h_screen_html,  false)
+/* Pack M+: AP-mode setup wizard (port of lib/webserver/setup_htm.h).
+ * No auth on these three: the device is in soft-AP fallback when the
+ * user hits them, so HTTP auth would only lock the user out of the
+ * very page they need to recover the device. */
+ROUTE(GET,  "/setup",           h_setup,        false)
+ROUTE(GET,  "/scan",            h_scan,         false)
+ROUTE(GET,  "/backup",          h_backup,       false)
+ROUTE(GET,  "/list",            h_list,         true)
+ROUTE(GET,  "/edit",            h_edit,         true)
+/* P1-E: gzip-compressed SPIFFS editor HTML (the JS inside it calls
+ * /list / /edit?file= / /upload / /delete / /save). Auth-gated below
+ * so guest users can't browse the device files. */
+ROUTE(GET,  "/files",           h_files_html,   true)
+
+/* ── POST ────────────────────────────────────────────────────── */
+ROUTE(POST, "/connect",            h_connect,     false)
+ROUTE(POST, "/api/power",          h_power,       true)
+ROUTE(POST, "/api/sleep",          h_sleep,       true)
+ROUTE(POST, "/api/notify",         h_notify,      true)
+ROUTE(POST, "/api/notify/dismiss", h_dismiss,     true)
+ROUTE(POST, "/api/apps",           h_apps_post,   true)
+ROUTE(POST, "/api/switch",         h_switch_app,  true)
+ROUTE(POST, "/api/nextapp",        h_nextapp,     true)
+ROUTE(POST, "/api/previousapp",    h_previousapp, true)
+ROUTE(POST, "/api/settings",       h_settings_post, true)
+ROUTE(POST, "/api/reboot",         h_reboot,      true)
+ROUTE(POST, "/api/rtttl",          h_rtttl,       true)
+ROUTE(POST, "/api/sound",          h_sound,       true)
+ROUTE(POST, "/api/moodlight",      h_moodlight,   true)
+ROUTE(POST, "/api/erase",          h_erase,       true)
+ROUTE(POST, "/api/resetSettings",  h_reset,       true)
+ROUTE(POST, "/api/reorder",        h_reorder,     true)
+ROUTE(POST, "/api/custom",         h_custom,      true)
+ROUTE(POST, "/api/indicator1",     h_indicator,   true)
+ROUTE(POST, "/api/indicator2",     h_indicator,   true)
+ROUTE(POST, "/api/indicator3",     h_indicator,   true)
+ROUTE(POST, "/api/r2d2",           h_r2d2,        true)
+ROUTE(POST, "/upload",             h_upload,      true)
+ROUTE(POST, "/delete",             h_delete,      true)
+ROUTE(POST, "/save",               h_save,        true)

@@ -8,8 +8,7 @@ extern "C" {
 #endif
 
 /* ── Core types ──────────────────────────────────────────────── */
-typedef struct
-{
+typedef struct {
     uint8_t r;
     uint8_t g;
     uint8_t b;

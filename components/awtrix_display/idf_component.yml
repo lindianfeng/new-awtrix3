@@ -1,0 +1,8 @@
+# Pack L: official Espressif JPEG decoder for the customApp / notification
+# icon path. We deliberately don't pull a full GIF decoder yet (pack K
+# falls back to a much simpler .rgb565 raw bitmap format) — JPEG covers the
+# vast majority of LaMetric / icon-bank assets users actually use, and
+# `esp_new_jpeg` is the production-quality SoC-tuned decoder maintained
+# by Espressif themselves.
+dependencies:
+  espressif/esp_new_jpeg: "^0.6.1"

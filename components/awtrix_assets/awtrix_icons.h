@@ -12,17 +12,16 @@ extern "C" {
  * Lookup by numeric id (same scheme as the original LaMetric/Awtrix
  * "icon id"). icon_get returns NULL if id is unknown.
  */
-typedef struct
-{
+typedef struct {
     uint16_t id;
-    const uint16_t* data; /* 64 RGB565 pixels */
+    const uint16_t *data; /* 64 RGB565 pixels */
 } awtrix_icon_t;
 
-const uint16_t* icon_get(uint16_t id);
+const uint16_t *icon_get(uint16_t id);
 int icon_count(void);
 
 /* Iterate over the entire icon table — used by stats/inventory APIs. */
-const awtrix_icon_t* icon_at(int idx);
+const awtrix_icon_t *icon_at(int idx);
 
 #ifdef __cplusplus
 }

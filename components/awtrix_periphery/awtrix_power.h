@@ -12,7 +12,7 @@ extern "C" {
 void awtrix_power_sleep(unsigned long seconds);
 
 /* Accepts {"seconds":N} or {"hours":H,"minutes":M,"seconds":S}. */
-void awtrix_power_sleep_parser(const char* json);
+void awtrix_power_sleep_parser(const char *json);
 
 #ifdef __cplusplus
 }

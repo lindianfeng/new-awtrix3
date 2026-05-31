@@ -28,7 +28,7 @@ extern "C" {
 /* ── Buttons ─────────────────────────────────────────────────── */
 #define BUTTON_LEFT_PIN    7
 #define BUTTON_RIGHT_PIN   8
-#define BUTTON_SELECT_PIN 10
+#define BUTTON_SELECT_PIN 12
 #define BUTTON_RESET_PIN  13
 
 /* ── Buzzer ──────────────────────────────────────────────────── */

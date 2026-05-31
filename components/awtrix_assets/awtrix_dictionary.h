@@ -14,9 +14,9 @@ extern "C" {
  *   - monthShort(lang, idx): idx 0..11 (Jan..Dec)
  */
 
-const char* dict_day_short(const char* lang, int day_idx); /* 3-letter */
-const char* dict_month_short(const char* lang, int month_idx); /* 3-letter */
-const char* dict_day_long(const char* lang, int day_idx);
+const char *dict_day_short(const char *lang, int day_idx);   /* 3-letter */
+const char *dict_month_short(const char *lang, int month_idx); /* 3-letter */
+const char *dict_day_long(const char *lang, int day_idx);
 
 #ifdef __cplusplus
 }

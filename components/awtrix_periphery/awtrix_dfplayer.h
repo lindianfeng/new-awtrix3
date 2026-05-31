@@ -16,8 +16,8 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 
-bool awtrix_dfp_init(void); /* uart driver + 1s warm-up */
-void awtrix_dfp_set_volume(uint8_t vol); /* 0..30 */
+bool awtrix_dfp_init(void);                /* uart driver + 1s warm-up */
+void awtrix_dfp_set_volume(uint8_t vol);   /* 0..30 */
 void awtrix_dfp_play_file_number(uint16_t n);
 void awtrix_dfp_play_folder(uint8_t folder, uint8_t file);
 void awtrix_dfp_stop(void);

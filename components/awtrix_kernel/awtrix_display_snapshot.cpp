@@ -2,12 +2,14 @@
 
 #include <cJSON.h>
 
-AwtrixDisplaySnapshot &AwtrixDisplaySnapshot::get() {
+AwtrixDisplaySnapshot& AwtrixDisplaySnapshot::get()
+{
     static AwtrixDisplaySnapshot instance;
     return instance;
 }
 
-void AwtrixDisplaySnapshot::updateFrameRgb888(const uint32_t *pixels, int count, int width, int height) {
+void AwtrixDisplaySnapshot::updateFrameRgb888(const uint32_t* pixels, int count, int width, int height)
+{
     if (!pixels || count <= 0) return;
     const int maxPixels = MATRIX_WIDTH * MATRIX_HEIGHT;
     if (count > maxPixels) count = maxPixels;
@@ -21,7 +23,8 @@ void AwtrixDisplaySnapshot::updateFrameRgb888(const uint32_t *pixels, int count,
     portEXIT_CRITICAL(&m_lock);
 }
 
-std::string AwtrixDisplaySnapshot::screenJson() const {
+std::string AwtrixDisplaySnapshot::screenJson() const
+{
     uint32_t copy[MATRIX_WIDTH * MATRIX_HEIGHT];
     int width = MATRIX_WIDTH;
     int height = MATRIX_HEIGHT;
@@ -39,10 +42,10 @@ std::string AwtrixDisplaySnapshot::screenJson() const {
     const int maxPixels = MATRIX_WIDTH * MATRIX_HEIGHT;
     if (total < 0 || total > maxPixels) total = maxPixels;
 
-    cJSON *arr = cJSON_CreateArray();
+    cJSON* arr = cJSON_CreateArray();
     if (!arr) return "[]";
     for (int i = 0; i < total; ++i) cJSON_AddItemToArray(arr, cJSON_CreateNumber((int)copy[i]));
-    char *s = cJSON_PrintUnformatted(arr);
+    char* s = cJSON_PrintUnformatted(arr);
     std::string out(s ? s : "[]");
     if (s) cJSON_free(s);
     cJSON_Delete(arr);

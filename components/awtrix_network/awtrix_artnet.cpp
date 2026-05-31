@@ -50,31 +50,44 @@ static int s_latest_pixels = MATRIX_WIDTH * MATRIX_HEIGHT;
 static bool s_frame_pending = false;
 
 /* Minimal Art-Net packet parse: header "Art-Net\0" + opcode 0x5000 (OpDmx). */
-static void artnet_task(void *) {
+static void artnet_task(void*)
+{
     struct sockaddr_in addr{};
     s_sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (s_sock < 0) { ESP_LOGE(TAG, "Art-Net socket failed"); vTaskDelete(nullptr); return; }
+    if (s_sock < 0)
+    {
+        ESP_LOGE(TAG, "Art-Net socket failed");
+        vTaskDelete(nullptr);
+        return;
+    }
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
     addr.sin_port = htons(ARTNET_PORT);
-    if (bind(s_sock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-        ESP_LOGE(TAG, "Art-Net bind failed"); close(s_sock); s_sock = -1;
-        vTaskDelete(nullptr); return;
+    if (bind(s_sock, (struct sockaddr*)&addr, sizeof(addr)) < 0)
+    {
+        ESP_LOGE(TAG, "Art-Net bind failed");
+        close(s_sock);
+        s_sock = -1;
+        vTaskDelete(nullptr);
+        return;
     }
     /* Bug 2: 1 s recv() timeout so s_run = false is honoured promptly
      * and stop() can reclaim the task without relying on shutdown()
      * to unblock the syscall. Without this, a quiet link kept the
      * task blocked indefinitely, leaking 4 KB of stack each cycle
      * the user toggled artnetMode. */
-    struct timeval rcv_to = { .tv_sec = 1, .tv_usec = 0 };
-    if (setsockopt(s_sock, SOL_SOCKET, SO_RCVTIMEO, &rcv_to, sizeof(rcv_to)) != 0) {
+    struct timeval rcv_to = {.tv_sec = 1, .tv_usec = 0};
+    if (setsockopt(s_sock, SOL_SOCKET, SO_RCVTIMEO, &rcv_to, sizeof(rcv_to)) != 0)
+    {
         ESP_LOGW(TAG, "Art-Net SO_RCVTIMEO failed (recv will block forever)");
     }
     ESP_LOGI(TAG, "Art-Net listening on UDP/%d", ARTNET_PORT);
     uint8_t buf[600];
-    while (s_run) {
+    while (s_run)
+    {
         int n = recv(s_sock, buf, sizeof(buf), 0);
-        if (n < 0) {
+        if (n < 0)
+        {
             /* EAGAIN / EWOULDBLOCK = the 1 s timeout fired with no data;
              * loop back and re-check s_run. Any other negative return
              * means the socket has been shut down — exit the task. */
@@ -87,47 +100,56 @@ static void artnet_task(void *) {
         uint16_t op = (uint16_t)buf[8] | ((uint16_t)buf[9] << 8);
         if (op != 0x5000) continue; /* OpDmx */
         uint16_t universe = (uint16_t)buf[14] | ((uint16_t)buf[15] << 8);
-        uint16_t len      = ((uint16_t)buf[16] << 8) | buf[17];
+        uint16_t len = ((uint16_t)buf[16] << 8) | buf[17];
         if (len + 18 > n) len = n - 18;
-        const uint8_t *dmx = buf + 18;
+        const uint8_t* dmx = buf + 18;
 
         if (!CONFIG.artnetMode) continue;
         const int total = MATRIX_WIDTH * MATRIX_HEIGHT;
-        const int startLed = universe * 170;     /* 170 LEDs per DMX universe */
+        const int startLed = universe * 170; /* 170 LEDs per DMX universe */
         if (startLed >= total) continue;
 
         portENTER_CRITICAL(&s_frame_lock);
-        for (int i = 0; i + 3 <= len && (startLed + i / 3) < total; i += 3) {
+        for (int i = 0; i + 3 <= len && (startLed + i / 3) < total; i += 3)
+        {
             s_latest_frame[startLed + i / 3] = ((uint32_t)dmx[i + 0] << 16) |
-                                              ((uint32_t)dmx[i + 1] << 8) |
-                                              (uint32_t)dmx[i + 2];
+                ((uint32_t)dmx[i + 1] << 8) |
+                (uint32_t)dmx[i + 2];
         }
         s_latest_pixels = total;
         s_frame_pending = true;
         portEXIT_CRITICAL(&s_frame_lock);
     }
-    if (s_sock >= 0) { close(s_sock); s_sock = -1; }
+    if (s_sock >= 0)
+    {
+        close(s_sock);
+        s_sock = -1;
+    }
     vTaskDelete(nullptr);
 }
 
-void awtrix_artnet_start(void) {
+void awtrix_artnet_start(void)
+{
     if (s_run) return;
     s_run = true;
     xTaskCreate(artnet_task, "artnet", 4096, nullptr, 5, &s_task);
 }
 
-void awtrix_artnet_stop(void) {
+void awtrix_artnet_stop(void)
+{
     s_run = false;
     if (s_sock >= 0) shutdown(s_sock, SHUT_RDWR);
 }
 
-bool awtrix_artnet_take_frame(uint32_t *rgb888, int max_pixels, int *out_pixels) {
+bool awtrix_artnet_take_frame(uint32_t* rgb888, int max_pixels, int* out_pixels)
+{
     if (!rgb888 || max_pixels <= 0) return false;
 
     bool hasFrame = false;
     int pixels = 0;
     portENTER_CRITICAL(&s_frame_lock);
-    if (s_frame_pending) {
+    if (s_frame_pending)
+    {
         pixels = s_latest_pixels;
         if (pixels > max_pixels) pixels = max_pixels;
         memcpy(rgb888, s_latest_frame, sizeof(uint32_t) * pixels);

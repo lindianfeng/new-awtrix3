@@ -35,17 +35,17 @@
 #   - cjson                 : effects_core JSON settings parser.
 idf_component_register(
         SRCS "led_matrix.c"
-             "matrix_cpp.cpp"
-             "awtrix_font.cpp"
-             "GifPlayer.cpp"
-             "effects_core.cpp"
-             "awtrix_notifications.cpp"
-             "awtrix_notification_overlay.cpp"
-             "awtrix_render.cpp"
-             "awtrix_status_overlay.cpp"
-             "awtrix_menu_overlay.cpp"
-             "awtrix_overlay_registry.cpp"
-             "awtrix_icon_loader.cpp"
+        "matrix_cpp.cpp"
+        "awtrix_font.cpp"
+        "GifPlayer.cpp"
+        "effects_core.cpp"
+        "awtrix_notifications.cpp"
+        "awtrix_notification_overlay.cpp"
+        "awtrix_render.cpp"
+        "awtrix_status_overlay.cpp"
+        "awtrix_menu_overlay.cpp"
+        "awtrix_overlay_registry.cpp"
+        "awtrix_icon_loader.cpp"
         INCLUDE_DIRS "."
         REQUIRES awtrix_hal awtrix_kernel awtrix_config
         PRIV_REQUIRES led_strip esp_timer cjson spiffs espressif__esp_new_jpeg

@@ -10,6 +10,6 @@ class GifPlayer;
 
 using AwtrixStatusOverlayCallback = std::function<void(Matrix &, UiState &, GifPlayer *)>;
 
-const AwtrixStatusOverlayCallback &awtrix_status_overlay();
+const AwtrixStatusOverlayCallback& awtrix_status_overlay();
 
 #endif /* __cplusplus */

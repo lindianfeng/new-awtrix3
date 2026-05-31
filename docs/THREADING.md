@@ -4,15 +4,15 @@ This document captures the locking discipline for every shared mutable object
 in the firmware. The build runs on **ESP32-S3** with **2 cores** and **3+
 FreeRTOS tasks** that all touch the singleton state:
 
-| Task / source         | Files                                                                    | Cadence       |
-|-----------------------|--------------------------------------------------------------------------|---------------|
-| `main` loop           | `main/app_main.cpp`                                                      | ~62 Hz tick   |
-| Wi-Fi event dispatcher| esp_event default task                                                   | bursty        |
-| MQTT client callback  | `awtrix_network/awtrix_mqtt.cpp::mqtt_event_handler`                     | per msg       |
-| HTTP request handlers | `awtrix_http/awtrix_api.cpp::h_*`                                        | per request   |
-| iot_button callbacks  | `awtrix_periphery/awtrix_periphery.cpp::_button_event_cb`                | per press     |
-| Art-Net receive task  | `awtrix_network/awtrix_artnet.cpp` background task                       | bursty        |
-| btncb worker task     | `awtrix_http/awtrix_api.cpp::btn_cb_worker_task`                         | bursty        |
+| Task / source          | Files                                                     | Cadence     |
+|------------------------|-----------------------------------------------------------|-------------|
+| `main` loop            | `main/app_main.cpp`                                       | ~62 Hz tick |
+| Wi-Fi event dispatcher | esp_event default task                                    | bursty      |
+| MQTT client callback   | `awtrix_network/awtrix_mqtt.cpp::mqtt_event_handler`      | per msg     |
+| HTTP request handlers  | `awtrix_http/awtrix_api.cpp::h_*`                         | per request |
+| iot_button callbacks   | `awtrix_periphery/awtrix_periphery.cpp::_button_event_cb` | per press   |
+| Art-Net receive task   | `awtrix_network/awtrix_artnet.cpp` background task        | bursty      |
+| btncb worker task      | `awtrix_http/awtrix_api.cpp::btn_cb_worker_task`          | bursty      |
 
 If you add a new task or a new shared object, please update this file in the
 same change.
@@ -38,6 +38,7 @@ copy data out under the spinlock, release, then do the I/O.
 ## Shared objects
 
 ### 1. `AwtrixConfig` (70-field persisted config singleton)
+
 - File: `awtrix_config/awtrix_globals.h`, `awtrix_globals.cpp`
 - Lock: `m_lock` — recursive `SemaphoreHandle_t` (opaque `void *` in
   the header per A3; cast back in the .cpp).
@@ -47,6 +48,7 @@ copy data out under the spinlock, release, then do the I/O.
   hold the lock and pass through a helper that re-takes it.
 
 ### 2. `DisplayManager` (UI state + app rotation)
+
 - File: `awtrix_core/DisplayManager.h`
 - Lock: `m_dataLock` — `portMUX_TYPE`.
 - API: `DisplayManager::Lock _l(&m_dataLock);` RAII helper.
@@ -55,6 +57,7 @@ copy data out under the spinlock, release, then do the I/O.
   custom apps, reorder, eraseCustomApp).
 
 ### 3. `AwtrixAppRegistry` (apps + customApps lookup)
+
 - File: `awtrix_kernel/awtrix_apps.h`, `awtrix_kernel/awtrix_apps.cpp`
 - Lock: **none of its own** — caller holds `DisplayManager::m_dataLock`.
 - Rationale: every mutator is reached through `DisplayManager` methods
@@ -62,6 +65,7 @@ copy data out under the spinlock, release, then do the I/O.
   take the lock at the call site. Avoids a double-lock.
 
 ### 4. `AwtrixNotificationManager` (notification FIFO) — **M2**
+
 - File: `awtrix_display/awtrix_notifications.h`, `.cpp`
 - Lock: `m_mux` — `portMUX_TYPE`.
 - API: `AwtrixNotificationManager::Lock _l(NOTIFICATIONS.mux());`
@@ -71,6 +75,7 @@ copy data out under the spinlock, release, then do the I/O.
   takes the lock at the top of its lambda (~50 µs critical section).
 
 ### 5. `PeripheryManager::m_btnLock` (button event ring buffer)
+
 - File: `awtrix_periphery/awtrix_periphery.h`
 - Lock: `m_btnLock` — `portMUX_TYPE`.
 - Protects: `m_pendingBtnEvent[4]`, `m_veryLongFired[4]`.
@@ -79,18 +84,21 @@ copy data out under the spinlock, release, then do the I/O.
 - Reader: `PeripheryManager::tick()` (main loop).
 
 ### 6. `AwtrixDisplaySnapshot` (RGB888 frame for /api/screen)
+
 - File: `awtrix_kernel/awtrix_display_snapshot.h`, `.cpp`
 - Lock: `m_lock` — `portMUX_TYPE`.
 - Writers: `DisplayManager::tick()` after `m_matrix->show()`.
 - Readers: HTTP `/api/screen` / `/fullscreen` handlers.
 
 ### 7. `awtrix_placeholders` (MQTT topic → latest value cache)
+
 - File: `awtrix_kernel/awtrix_placeholders.cpp`
 - Lock: file-local `Registry::lock` — `portMUX_TYPE`.
 - Writers: MQTT data callback (`awtrix_mqtt.cpp::process_message`).
 - Readers: customApp renderer in `DisplayManager_customApp.cpp`.
 
 ### 8. `awtrix_artnet` frame buffer
+
 - File: `awtrix_network/awtrix_artnet.cpp`
 - Lock: `s_frame_lock` — `portMUX_TYPE`.
 - Writer: receive task `recv()` callback.
@@ -98,6 +106,7 @@ copy data out under the spinlock, release, then do the I/O.
   `awtrix_artnet_take_frame()`.
 
 ### 9. `AwtrixCommand` queue (FreeRTOS Queue) — **lock-free**
+
 - File: `awtrix_kernel/awtrix_command_bus.cpp`
 - Lock: none — FreeRTOS `xQueueSend` / `xQueueReceive` are intrinsically
   thread-safe.
@@ -106,6 +115,7 @@ copy data out under the spinlock, release, then do the I/O.
 - Reader: `DisplayManager::processPendingEvents()` in the display tick.
 
 ### 10. `awtrix::StateMachine` (system state) — **L1, atomic**
+
 - File: `awtrix_kernel/awtrix_system_state.cpp`
 - Lock: none — `std::atomic<uint8_t>` with acquire/release ordering.
 - Writers: WiFi event handler, `DisplayManager::moodlight`/`setPower`,
@@ -135,10 +145,10 @@ copy data out under the spinlock, release, then do the I/O.
 ## How to add a new shared object
 
 1. Pick the lock type using this decision tree:
-   - Critical section does no I/O AND fits in <100 µs → `portMUX_TYPE`.
-   - Critical section calls NVS / SPIFFS / cJSON / network → recursive
-     `SemaphoreHandle_t` mutex.
-   - Single primitive read/write → `std::atomic<T>` (no lock).
+    - Critical section does no I/O AND fits in <100 µs → `portMUX_TYPE`.
+    - Critical section calls NVS / SPIFFS / cJSON / network → recursive
+      `SemaphoreHandle_t` mutex.
+    - Single primitive read/write → `std::atomic<T>` (no lock).
 2. Add a RAII `Lock` helper (copy from any of the existing objects).
 3. Document it in the **Shared objects** table above.
 4. If the critical section ever needs to mix two locks, add the pair to

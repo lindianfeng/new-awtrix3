@@ -1,7 +1,8 @@
 # new-awtrix3 — AWTRIX3 的 ESP-IDF 6.0 移植版
 
 > 面向 **ESP32-S3 / Ulanzi TC001 32×8 点阵时钟硬件** 的 AWTRIX3 固件移植项目。  
-> 本项目将原 AWTRIX3 的 Arduino / PlatformIO 生态实现，重组为标准 **ESP-IDF 6.0.1 + CMake 组件化工程**，目标是在更接近 ESP-IDF 原生开发方式的基础上保留 AWTRIX3 的核心显示、HTTP、MQTT、Home Assistant、外设与自定义 App 能力。
+> 本项目将原 AWTRIX3 的 Arduino / PlatformIO 生态实现，重组为标准 **ESP-IDF 6.0.1 + CMake 组件化工程**，目标是在更接近
+> ESP-IDF 原生开发方式的基础上保留 AWTRIX3 的核心显示、HTTP、MQTT、Home Assistant、外设与自定义 App 能力。
 
 ---
 
@@ -44,9 +45,11 @@
    包括 32×8 点阵显示、时间/日期/温湿度/电量/天气 App、通知、Moodlight、自定义 App、按钮导航、MQTT 控制、Home Assistant 自动发现等。
 
 4. **面向后续工程化维护**  
-   通过 CMake、组件依赖、ESP-IDF managed components、NVS/SPIFFS、FreeRTOS 任务模型，为后续加入测试、CI、Web UI、OTA、更多硬件板卡和更强并发安全打基础。
+   通过 CMake、组件依赖、ESP-IDF managed components、NVS/SPIFFS、FreeRTOS 任务模型，为后续加入测试、CI、Web
+   UI、OTA、更多硬件板卡和更强并发安全打基础。
 
-本仓库不是简单的“编译脚本移植”，而是一次较完整的运行时迁移：显示驱动、JSON 解析、HTTP 服务、MQTT、mDNS、SPIFFS、按钮、蜂鸣器、配置持久化都已改为 ESP-IDF 体系。
+本仓库不是简单的“编译脚本移植”，而是一次较完整的运行时迁移：显示驱动、JSON 解析、HTTP 服务、MQTT、mDNS、SPIFFS、按钮、蜂鸣器、配置持久化都已改为
+ESP-IDF 体系。
 
 ---
 
@@ -54,27 +57,27 @@
 
 根据当前源码和项目内报告，项目已具备以下能力：
 
-| 模块 | 状态 | 说明 |
-|---|---:|---|
-| ESP-IDF 工程结构 | ✅ | 顶层 `CMakeLists.txt` + `main/` + `components/` 标准结构 |
-| 目标芯片 | ✅ | `CONFIG_IDF_TARGET="esp32s3"` |
-| Ulanzi TC001 板级定义 | ✅ | `components/awtrix_hal/boards/ulanzi_s3.h` |
-| LED 点阵显示 | ✅ | 32×8 WS2812，基于 `espressif/led_strip` / RMT |
-| NVS 配置 | ✅ | `AwtrixConfig` 单例封装持久化配置 |
-| SPIFFS | ✅ | 用于自定义 App、开发配置等文件 |
-| HTTP 服务 | ✅ | `esp_http_server` 封装，提供 Web/API 路由 |
-| MQTT | ✅ | 基于 `espressif/mqtt`，支持控制主题和统计上报 |
-| Home Assistant Discovery | ✅ | 发布多个 light/sensor/binary_sensor/number 实体 |
-| mDNS / UDP Discovery | ✅ | 支持局域网发现 |
-| 按钮 | ✅ | 左/右/选择/复位按钮，支持菜单和导航 |
-| 通知 | ✅ | 支持 JSON 通知、滚动、颜色、RTTTL 声音触发 |
-| Moodlight | ✅ | 支持纯色/色温模式 |
-| 自定义 App | ✅ | 支持 JSON 自定义页面、绘图 DSL、持久化加载 |
-| 天气 Overlay | ✅ | drizzle/rain/snow/storm/thunder/frost 等前景特效 |
-| GIF/JPEG | ⚠️ | GIF 解码占位/简化；JPEG 不完整，见已知限制 |
-| Web 配网页面 | ⚠️ | 当前为最小内嵌页面，完整可视化配置 UI 仍需完善 |
-| 并发安全 | ⚠️ | 部分 DisplayManager 状态已加锁，但全局配置/跨任务状态仍建议继续治理 |
-| 自动 OTA | ⚠️/待定 | 当前源码入口未看到完整 OTA 路由与启动流程，建议后续明确是否恢复 |
+| 模块                       |    状态 | 说明                                                 |
+|--------------------------|------:|----------------------------------------------------|
+| ESP-IDF 工程结构             |     ✅ | 顶层 `CMakeLists.txt` + `main/` + `components/` 标准结构 |
+| 目标芯片                     |     ✅ | `CONFIG_IDF_TARGET="esp32s3"`                      |
+| Ulanzi TC001 板级定义        |     ✅ | `components/awtrix_hal/boards/ulanzi_s3.h`         |
+| LED 点阵显示                 |     ✅ | 32×8 WS2812，基于 `espressif/led_strip` / RMT         |
+| NVS 配置                   |     ✅ | `AwtrixConfig` 单例封装持久化配置                           |
+| SPIFFS                   |     ✅ | 用于自定义 App、开发配置等文件                                  |
+| HTTP 服务                  |     ✅ | `esp_http_server` 封装，提供 Web/API 路由                 |
+| MQTT                     |     ✅ | 基于 `espressif/mqtt`，支持控制主题和统计上报                    |
+| Home Assistant Discovery |     ✅ | 发布多个 light/sensor/binary_sensor/number 实体          |
+| mDNS / UDP Discovery     |     ✅ | 支持局域网发现                                            |
+| 按钮                       |     ✅ | 左/右/选择/复位按钮，支持菜单和导航                                |
+| 通知                       |     ✅ | 支持 JSON 通知、滚动、颜色、RTTTL 声音触发                        |
+| Moodlight                |     ✅ | 支持纯色/色温模式                                          |
+| 自定义 App                  |     ✅ | 支持 JSON 自定义页面、绘图 DSL、持久化加载                         |
+| 天气 Overlay               |     ✅ | drizzle/rain/snow/storm/thunder/frost 等前景特效        |
+| GIF/JPEG                 |    ⚠️ | GIF 解码占位/简化；JPEG 不完整，见已知限制                         |
+| Web 配网页面                 |    ⚠️ | 当前为最小内嵌页面，完整可视化配置 UI 仍需完善                          |
+| 并发安全                     |    ⚠️ | 部分 DisplayManager 状态已加锁，但全局配置/跨任务状态仍建议继续治理         |
+| 自动 OTA                   | ⚠️/待定 | 当前源码入口未看到完整 OTA 路由与启动流程，建议后续明确是否恢复                 |
 
 > 说明：项目内 `PORTING_REPORT.md` 和 `REVIEW_REPORT.md` 记录了移植过程、架构审查和历史状态。README 以当前源码为主，报告可作为深度开发参考。
 
@@ -92,25 +95,26 @@ components/awtrix_hal/boards/ulanzi_s3.h
 
 关键参数：
 
-| 项目 | 配置 |
-|---|---|
-| MCU | ESP32-S3 |
-| Flash | 16 MB |
-| PSRAM | Octal PSRAM，80 MHz |
-| 点阵尺寸 | 32 × 8 |
-| LED 数据引脚 | GPIO5 |
-| 矩阵布局 | 4 个 8×8 面板，progressive |
-| 左键 | GPIO7 |
-| 右键 | GPIO8 |
-| 选择键 | GPIO10 |
-| 复位键 | GPIO13 |
-| 蜂鸣器 | GPIO15 |
-| 电池 ADC | GPIO4 / ADC1_CH4 |
-| 光敏 ADC | GPIO6 / ADC1_CH6 |
-| I2C SCL | GPIO10 |
-| I2C SDA | GPIO11 |
+| 项目       | 配置                     |
+|----------|------------------------|
+| MCU      | ESP32-S3               |
+| Flash    | 16 MB                  |
+| PSRAM    | Octal PSRAM，80 MHz     |
+| 点阵尺寸     | 32 × 8                 |
+| LED 数据引脚 | GPIO5                  |
+| 矩阵布局     | 4 个 8×8 面板，progressive |
+| 左键       | GPIO7                  |
+| 右键       | GPIO8                  |
+| 选择键      | GPIO10                 |
+| 复位键      | GPIO13                 |
+| 蜂鸣器      | GPIO15                 |
+| 电池 ADC   | GPIO4 / ADC1_CH4       |
+| 光敏 ADC   | GPIO6 / ADC1_CH6       |
+| I2C SCL  | GPIO10                 |
+| I2C SDA  | GPIO11                 |
 
-> 注意：当前 `BUTTON_SELECT_PIN` 和 `I2C_SCL_PIN` 都使用 GPIO10。若后续实际接入 I2C 传感器，应重新核对硬件原理图和引脚复用，避免按钮与 I2C 冲突。
+> 注意：当前 `BUTTON_SELECT_PIN` 和 `I2C_SCL_PIN` 都使用 GPIO10。若后续实际接入 I2C 传感器，应重新核对硬件原理图和引脚复用，避免按钮与
+> I2C 冲突。
 
 ---
 
@@ -153,33 +157,33 @@ dependencies:
 
 用途概览：
 
-| 依赖 | 用途 |
-|---|---|
-| `espressif/button` | 物理按键事件抽象 |
-| `espressif/led_strip` | WS2812 LED 点阵 RMT 驱动 |
-| `espressif/cjson` | HTTP/MQTT/配置 JSON 解析 |
-| `espressif/mdns` | 局域网服务发现 |
-| `espressif/mqtt` | MQTT 客户端 |
-| ESP-IDF 内建 `spiffs` | 文件系统 |
-| ESP-IDF 内建 `nvs_flash` | 配置持久化 |
-| ESP-IDF 内建 `esp_http_server` | HTTP API 服务 |
-| ESP-IDF 内建 `esp_wifi`/`esp_netif` | Wi-Fi 和网络栈 |
+| 依赖                                | 用途                   |
+|-----------------------------------|----------------------|
+| `espressif/button`                | 物理按键事件抽象             |
+| `espressif/led_strip`             | WS2812 LED 点阵 RMT 驱动 |
+| `espressif/cjson`                 | HTTP/MQTT/配置 JSON 解析 |
+| `espressif/mdns`                  | 局域网服务发现              |
+| `espressif/mqtt`                  | MQTT 客户端             |
+| ESP-IDF 内建 `spiffs`               | 文件系统                 |
+| ESP-IDF 内建 `nvs_flash`            | 配置持久化                |
+| ESP-IDF 内建 `esp_http_server`      | HTTP API 服务          |
+| ESP-IDF 内建 `esp_wifi`/`esp_netif` | Wi-Fi 和网络栈           |
 
 ### 4.3 Arduino 依赖替换关系
 
-| 原 Arduino/PlatformIO 生态 | ESP-IDF 移植实现 |
-|---|---|
+| 原 Arduino/PlatformIO 生态     | ESP-IDF 移植实现                                     |
+|-----------------------------|--------------------------------------------------|
 | FastLED / FastLED_NeoMatrix | 自研 `Matrix` C++ 类 + `led_matrix.c` + `led_strip` |
-| ArduinoJson | `cJSON` |
-| PubSubClient | `esp-mqtt` |
-| WebServer / FSWebServer | `esp_http_server` + `AwtrixHttpServer` 封装 |
-| WiFi.h | `esp_wifi` + `esp_netif` + `esp_event` |
-| LittleFS | SPIFFS |
-| Preferences | NVS |
-| Bounce2 | `espressif/button` |
-| mDNS | `espressif/mdns` |
-| Ticker | FreeRTOS tick / ESP timer |
-| Arduino `String` 生态 | C/C++ 标准库与 ESP-IDF C API 混用 |
+| ArduinoJson                 | `cJSON`                                          |
+| PubSubClient                | `esp-mqtt`                                       |
+| WebServer / FSWebServer     | `esp_http_server` + `AwtrixHttpServer` 封装        |
+| WiFi.h                      | `esp_wifi` + `esp_netif` + `esp_event`           |
+| LittleFS                    | SPIFFS                                           |
+| Preferences                 | NVS                                              |
+| Bounce2                     | `espressif/button`                               |
+| mDNS                        | `espressif/mdns`                                 |
+| Ticker                      | FreeRTOS tick / ESP timer                        |
+| Arduino `String` 生态         | C/C++ 标准库与 ESP-IDF C API 混用                      |
 
 ---
 
@@ -285,7 +289,8 @@ HTTP 服务：
 
 #### `awtrix_events`
 
-事件总线组件，用于降低 `awtrix_core` 与 `awtrix_periphery` 的直接耦合。当前通过 `std::function` 槽位连接 RTTTL、声音、R2D2、亮度、通知等动作。
+事件总线组件，用于降低 `awtrix_core` 与 `awtrix_periphery` 的直接耦合。当前通过 `std::function` 槽位连接
+RTTTL、声音、R2D2、亮度、通知等动作。
 
 ---
 
@@ -456,12 +461,12 @@ factory,  app,  factory, 0x10000, 0x300000,
 fs,       data, spiffs,  0x310000,0xA0000,
 ```
 
-| 分区 | 类型 | 用途 | 大小 |
-|---|---|---|---:|
-| `nvs` | data/nvs | 配置持久化 | 24 KB |
-| `phy_init` | data/phy | PHY 初始化数据 | 4 KB |
-| `factory` | app/factory | 固件主体 | 3 MB |
-| `fs` | data/spiffs | 文件系统 | 640 KB |
+| 分区         | 类型          | 用途        |     大小 |
+|------------|-------------|-----------|-------:|
+| `nvs`      | data/nvs    | 配置持久化     |  24 KB |
+| `phy_init` | data/phy    | PHY 初始化数据 |   4 KB |
+| `factory`  | app/factory | 固件主体      |   3 MB |
+| `fs`       | data/spiffs | 文件系统      | 640 KB |
 
 ### 8.1 SPIFFS 用途
 
@@ -520,21 +525,21 @@ components/awtrix_config/awtrix_globals.cpp
 
 ### 9.1 配置类别
 
-| 类别 | 典型字段 |
-|---|---|
-| 身份信息 | `uniqueID`, `hostname`, `version` |
-| 网络 | `net_ip`, `net_gw`, `net_sn`, `net_static`, `ap_mode` |
-| MQTT | `mqtt_host`, `mqtt_user`, `mqtt_pass`, `mqtt_prefix`, `mqtt_port` |
-| Home Assistant | `ha_discovery`, `ha_prefix` |
-| HTTP | `auth_user`, `auth_pass`, `web_port` |
-| NTP | `ntp_server`, `ntp_tz` |
-| 显示 | `brightness`, `auto_brightness`, `rotate_screen`, `mirror_display`, `gamma` |
-| App 可见性 | `showTime`, `showDate`, `showTemp`, `showHum`, `showBat`, `showWeather` |
-| 格式化 | `timeFormat`, `dateFormat`, `showSeconds`, `showWeekday` |
-| 传感器 | `currentTemp`, `currentHum`, `currentLux`, `batteryPercent` |
-| 声音 | `soundActive`, `soundVolume`, `bootSound` |
-| 特效 | `bgEffect`, `globalOverlay` |
-| 运行状态 | `currentApp`, `artnetMode`, `moodlightMode`, `receivedMessages` |
+| 类别             | 典型字段                                                                        |
+|----------------|-----------------------------------------------------------------------------|
+| 身份信息           | `uniqueID`, `hostname`, `version`                                           |
+| 网络             | `net_ip`, `net_gw`, `net_sn`, `net_static`, `ap_mode`                       |
+| MQTT           | `mqtt_host`, `mqtt_user`, `mqtt_pass`, `mqtt_prefix`, `mqtt_port`           |
+| Home Assistant | `ha_discovery`, `ha_prefix`                                                 |
+| HTTP           | `auth_user`, `auth_pass`, `web_port`                                        |
+| NTP            | `ntp_server`, `ntp_tz`                                                      |
+| 显示             | `brightness`, `auto_brightness`, `rotate_screen`, `mirror_display`, `gamma` |
+| App 可见性        | `showTime`, `showDate`, `showTemp`, `showHum`, `showBat`, `showWeather`     |
+| 格式化            | `timeFormat`, `dateFormat`, `showSeconds`, `showWeekday`                    |
+| 传感器            | `currentTemp`, `currentHum`, `currentLux`, `batteryPercent`                 |
+| 声音             | `soundActive`, `soundVolume`, `bootSound`                                   |
+| 特效             | `bgEffect`, `globalOverlay`                                                 |
+| 运行状态           | `currentApp`, `artnetMode`, `moodlightMode`, `receivedMessages`             |
 
 ### 9.2 `dev.json` 一次性初始化
 
@@ -573,23 +578,23 @@ components/awtrix_config/awtrix_globals.cpp
 
 当前默认配置包括：
 
-| 字段 | 默认值 |
-|---|---|
-| `hostname` | `awtrix` |
-| `web_port` | `80` |
-| `mqtt_port` | `1883` |
-| `ha_prefix` | `homeassistant` |
-| `ntp_server` | `pool.ntp.org` |
-| `brightness` | `120` |
-| `min_brightness` | `10` |
-| `max_brightness` | `255` |
-| `matrix_fps` | `42` |
-| `showTime` | `true` |
-| `showDate/showTemp/showHum/showBat/showWeather` | `false` |
-| `timeFormat` | `%H:%M:%S` |
-| `dateFormat` | `%d.%m.%y` |
-| `soundActive` | `true` |
-| `soundVolume` | `25` |
+| 字段                                              | 默认值             |
+|-------------------------------------------------|-----------------|
+| `hostname`                                      | `awtrix`        |
+| `web_port`                                      | `80`            |
+| `mqtt_port`                                     | `1883`          |
+| `ha_prefix`                                     | `homeassistant` |
+| `ntp_server`                                    | `pool.ntp.org`  |
+| `brightness`                                    | `120`           |
+| `min_brightness`                                | `10`            |
+| `max_brightness`                                | `255`           |
+| `matrix_fps`                                    | `42`            |
+| `showTime`                                      | `true`          |
+| `showDate/showTemp/showHum/showBat/showWeather` | `false`         |
+| `timeFormat`                                    | `%H:%M:%S`      |
+| `dateFormat`                                    | `%d.%m.%y`      |
+| `soundActive`                                   | `true`          |
+| `soundVolume`                                   | `25`            |
 
 ---
 
@@ -606,52 +611,52 @@ components/awtrix_http/awtrix_api.cpp
 
 当前注册的 GET 路由：
 
-| 路由 | 用途 |
-|---|---|
-| `/` | 简化首页 |
-| `/version` | 固件版本 |
-| `/api/loop` | 当前 App loop 信息 |
-| `/api/effects` | 可用背景特效列表 |
-| `/api/transitions` | 可用转场列表 |
-| `/api/apps` | App 列表 |
-| `/api/settings` | 当前配置 JSON |
-| `/api/stats` | 当前统计信息 |
-| `/api/screen` | 当前屏幕像素 JSON |
-| `/fullscreen` | 全屏页面 |
-| `/backup` | 备份页面/接口入口 |
-| `/list` | 文件列表 |
-| `/edit` | 文件编辑入口 |
+| 路由                 | 用途             |
+|--------------------|----------------|
+| `/`                | 简化首页           |
+| `/version`         | 固件版本           |
+| `/api/loop`        | 当前 App loop 信息 |
+| `/api/effects`     | 可用背景特效列表       |
+| `/api/transitions` | 可用转场列表         |
+| `/api/apps`        | App 列表         |
+| `/api/settings`    | 当前配置 JSON      |
+| `/api/stats`       | 当前统计信息         |
+| `/api/screen`      | 当前屏幕像素 JSON    |
+| `/fullscreen`      | 全屏页面           |
+| `/backup`          | 备份页面/接口入口      |
+| `/list`            | 文件列表           |
+| `/edit`            | 文件编辑入口         |
 
 ### 10.2 POST 路由
 
 当前注册的 POST 路由：
 
-| 路由 | 用途 |
-|---|---|
-| `/api/power` | 开关屏/电源状态 |
-| `/api/sleep` | 睡眠/休眠相关控制 |
-| `/api/notify` | 发送通知 |
-| `/api/notify/dismiss` | 关闭通知 |
-| `/api/apps` | 更新 App 列表 |
-| `/api/switch` | 切换到指定 App |
-| `/api/nextapp` | 下一个 App |
-| `/api/previousapp` | 上一个 App |
-| `/api/settings` | 更新配置 |
-| `/api/reboot` | 重启设备 |
-| `/api/rtttl` | 播放 RTTTL |
-| `/api/sound` | 声音/DFPlayer 动作 |
-| `/api/moodlight` | Moodlight 模式 |
-| `/api/erase` | 擦除相关数据 |
-| `/api/resetSettings` | 重置设置 |
-| `/api/reorder` | App 重排序 |
-| `/api/custom` | 创建/更新自定义 App |
-| `/api/indicator1` | 指示灯 1 |
-| `/api/indicator2` | 指示灯 2 |
-| `/api/indicator3` | 指示灯 3 |
-| `/api/r2d2` | R2D2 声音效果 |
-| `/upload` | 文件上传 |
-| `/delete` | 文件删除 |
-| `/save` | 文件保存 |
+| 路由                    | 用途             |
+|-----------------------|----------------|
+| `/api/power`          | 开关屏/电源状态       |
+| `/api/sleep`          | 睡眠/休眠相关控制      |
+| `/api/notify`         | 发送通知           |
+| `/api/notify/dismiss` | 关闭通知           |
+| `/api/apps`           | 更新 App 列表      |
+| `/api/switch`         | 切换到指定 App      |
+| `/api/nextapp`        | 下一个 App        |
+| `/api/previousapp`    | 上一个 App        |
+| `/api/settings`       | 更新配置           |
+| `/api/reboot`         | 重启设备           |
+| `/api/rtttl`          | 播放 RTTTL       |
+| `/api/sound`          | 声音/DFPlayer 动作 |
+| `/api/moodlight`      | Moodlight 模式   |
+| `/api/erase`          | 擦除相关数据         |
+| `/api/resetSettings`  | 重置设置           |
+| `/api/reorder`        | App 重排序        |
+| `/api/custom`         | 创建/更新自定义 App   |
+| `/api/indicator1`     | 指示灯 1          |
+| `/api/indicator2`     | 指示灯 2          |
+| `/api/indicator3`     | 指示灯 3          |
+| `/api/r2d2`           | R2D2 声音效果      |
+| `/upload`             | 文件上传           |
+| `/delete`             | 文件删除           |
+| `/save`               | 文件保存           |
 
 ### 10.3 Basic Auth
 
@@ -856,13 +861,13 @@ homeassistant
 
 当前 `DisplayManager` 支持的内置 App：
 
-| App | 说明 |
-|---|---|
-| `Time` | 时间显示 |
-| `Date` | 日期显示 |
-| `Temp` | 温度显示 |
-| `Hum` | 湿度显示 |
-| `Bat` | 电池百分比显示 |
+| App       | 说明        |
+|-----------|-----------|
+| `Time`    | 时间显示      |
+| `Date`    | 日期显示      |
+| `Temp`    | 温度显示      |
+| `Hum`     | 湿度显示      |
+| `Bat`     | 电池百分比显示   |
 | `Weather` | 天气/温度文本显示 |
 
 是否显示由配置字段控制：
@@ -943,19 +948,20 @@ DisplayManager::generateNotification(uint8_t source, const char *json)
 
 常见 opcode：
 
-| opcode | 作用 |
-|---|---|
-| `dp` | draw pixel |
-| `dl` | draw line |
-| `db` | draw filled rectangle |
-| `dr` | draw rectangle |
-| `df` | draw filled circle |
-| `dc` | draw circle |
-| `dt` | draw text |
-| `dlp` | 定义调色板 |
-| `dpa` | 使用调色板画点 |
+| opcode | 作用                    |
+|--------|-----------------------|
+| `dp`   | draw pixel            |
+| `dl`   | draw line             |
+| `db`   | draw filled rectangle |
+| `dr`   | draw rectangle        |
+| `df`   | draw filled circle    |
+| `dc`   | draw circle           |
+| `dt`   | draw text             |
+| `dlp`  | 定义调色板                 |
+| `dpa`  | 使用调色板画点               |
 
-当前实现还包含编译缓存路径：解析自定义 App 时将 drawInstructions 编译为 POD `DrawOp`，避免每帧 `cJSON_Parse` 带来的堆分配压力。这是比原始“每帧解析 JSON”更适合 MCU 的做法。
+当前实现还包含编译缓存路径：解析自定义 App 时将 drawInstructions 编译为 POD `DrawOp`，避免每帧 `cJSON_Parse`
+带来的堆分配压力。这是比原始“每帧解析 JSON”更适合 MCU 的做法。
 
 ---
 
@@ -1010,13 +1016,13 @@ OVERLAY_FROST
 
 默认交互：
 
-| 按钮 | 非菜单状态 | 菜单状态 |
-|---|---|---|
-| 左键 | 上一个 App | 左移 |
-| 右键 | 下一个 App | 右移 |
-| 选择键短按 | 选择/关闭通知 | 确认 |
-| 选择键长按 | 打开菜单 | 菜单长按动作 |
-| 复位键超长按 | 恢复出厂/擦除配置后重启 | 同左 |
+| 按钮     | 非菜单状态        | 菜单状态   |
+|--------|--------------|--------|
+| 左键     | 上一个 App      | 左移     |
+| 右键     | 下一个 App      | 右移     |
+| 选择键短按  | 选择/关闭通知      | 确认     |
+| 选择键长按  | 打开菜单         | 菜单长按动作 |
+| 复位键超长按 | 恢复出厂/擦除配置后重启 | 同左     |
 
 支持 `swap_buttons`：设备倒装时可以逻辑交换左右键。
 
@@ -1183,9 +1189,9 @@ WLED 的优秀点：
 
 2. **Playlist / App Playlist**  
    当前 App loop 可进一步升级为可配置播放列表：
-   - 每个 App 独立 duration；
-   - 条件显示，如仅电池低时显示 Bat；
-   - 时间段规则，如夜间自动低亮。
+    - 每个 App 独立 duration；
+    - 条件显示，如仅电池低时显示 Bat；
+    - 时间段规则，如夜间自动低亮。
 
 3. **效果参数化**  
    每个背景特效和 Overlay 支持速度、密度、颜色、方向等参数，而不是仅枚举。
@@ -1216,14 +1222,14 @@ ESPHome 的优秀点：
 
 3. **诊断实体**  
    上报：
-   - free heap；
-   - minimum free heap；
-   - uptime；
-   - Wi-Fi RSSI；
-   - IP；
-   - firmware version；
-   - reset reason；
-   - PSRAM 使用量。
+    - free heap；
+    - minimum free heap；
+    - uptime；
+    - Wi-Fi RSSI；
+    - IP；
+    - firmware version；
+    - reset reason；
+    - PSRAM 使用量。
 
 4. **配置导入导出**  
    支持完整 JSON backup/restore，便于多设备复制配置。
@@ -1318,57 +1324,57 @@ AWTRIX3 的价值在于已有生态：
 ### P0：稳定性与安全性
 
 1. **全局并发模型收敛**
-   - DisplayManager 状态单写者；
-   - HTTP/MQTT 只投递事件；
-   - CONFIG 写入采用快照或 mutex；
-   - Matrix 写入集中到显示任务。
+    - DisplayManager 状态单写者；
+    - HTTP/MQTT 只投递事件；
+    - CONFIG 写入采用快照或 mutex；
+    - Matrix 写入集中到显示任务。
 
 2. **敏感 API 鉴权全覆盖**
-   - `/api/reboot`；
-   - `/api/erase`；
-   - `/api/resetSettings`；
-   - `/upload`、`/delete`、`/save`；
-   - `/api/settings`；
-   - `/api/custom`。
+    - `/api/reboot`；
+    - `/api/erase`；
+    - `/api/resetSettings`；
+    - `/upload`、`/delete`、`/save`；
+    - `/api/settings`；
+    - `/api/custom`。
 
 3. **文件上传安全**
-   - 限制路径穿越；
-   - 限制大小；
-   - 限制扩展名；
-   - 写入临时文件后原子替换。
+    - 限制路径穿越；
+    - 限制大小；
+    - 限制扩展名；
+    - 写入临时文件后原子替换。
 
 4. **崩溃恢复**
-   - 记录 reset reason；
-   - 连续启动失败进入安全模式；
-   - 提供恢复出厂入口。
+    - 记录 reset reason；
+    - 连续启动失败进入安全模式；
+    - 提供恢复出厂入口。
 
 ### P1：用户体验
 
 1. **完整 Web UI**
-   - Wi-Fi 配置；
-   - MQTT 配置；
-   - Home Assistant 开关；
-   - App 排序；
-   - 自定义 App 编辑器；
-   - 实时屏幕预览；
-   - 备份/恢复。
+    - Wi-Fi 配置；
+    - MQTT 配置；
+    - Home Assistant 开关；
+    - App 排序；
+    - 自定义 App 编辑器；
+    - 实时屏幕预览；
+    - 备份/恢复。
 
 2. **Captive Portal**
-   - 首次启动自动 AP；
-   - 手机自动弹出配网页面；
-   - 配网后保存并重启。
+    - 首次启动自动 AP；
+    - 手机自动弹出配网页面；
+    - 配网后保存并重启。
 
 3. **更完整的 Home Assistant Discovery**
-   - availability；
-   - device identifiers；
-   - suggested area；
-   - diagnostics；
-   - 可配置 entity category。
+    - availability；
+    - device identifiers；
+    - suggested area；
+    - diagnostics；
+    - 可配置 entity category。
 
 4. **WebSocket / SSE**
-   - 实时日志；
-   - 实时屏幕；
-   - 实时状态。
+    - 实时日志；
+    - 实时屏幕；
+    - 实时状态。
 
 ### P2：显示能力
 
@@ -1384,24 +1390,24 @@ AWTRIX3 的价值在于已有生态：
 ### P3：工程化
 
 1. **单元测试**
-   - JSON 配置解析；
-   - drawInstructions 编译；
-   - MQTT topic 解析；
-   - HTTP body 边界。
+    - JSON 配置解析；
+    - drawInstructions 编译；
+    - MQTT topic 解析；
+    - HTTP body 边界。
 
 2. **Host-based tests**
    使用 ESP-IDF host test 或普通 CMake 测试分离纯逻辑。
 
 3. **CI**
-   - `idf.py build`；
-   - 格式检查；
-   - 静态分析；
-   - size report。
+    - `idf.py build`；
+    - 格式检查；
+    - 静态分析；
+    - size report。
 
 4. **文档自动生成**
-   - API schema；
-   - MQTT topic 表；
-   - 配置字段表。
+    - API schema；
+    - MQTT topic 表；
+    - 配置字段表。
 
 ---
 
@@ -1613,4 +1619,5 @@ License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0
 
 ## 附录 B：项目定位一句话
 
-**new-awtrix3 是一个面向 Ulanzi TC001 / ESP32-S3 的 AWTRIX3 ESP-IDF 原生移植工程，当前已具备核心显示、HTTP、MQTT、Home Assistant 和自定义 App 能力，但仍建议优先完善并发安全、Web 配网、媒体解码、OTA 策略和工程化测试。**
+**new-awtrix3 是一个面向 Ulanzi TC001 / ESP32-S3 的 AWTRIX3 ESP-IDF 原生移植工程，当前已具备核心显示、HTTP、MQTT、Home
+Assistant 和自定义 App 能力，但仍建议优先完善并发安全、Web 配网、媒体解码、OTA 策略和工程化测试。**

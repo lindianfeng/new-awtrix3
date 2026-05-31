@@ -6,11 +6,12 @@
 #include <stdint.h>
 #include <string>
 
-class AwtrixDisplaySnapshot {
+class AwtrixDisplaySnapshot
+{
 public:
-    static AwtrixDisplaySnapshot &get();
+    static AwtrixDisplaySnapshot& get();
 
-    void updateFrameRgb888(const uint32_t *pixels, int count, int width, int height);
+    void updateFrameRgb888(const uint32_t* pixels, int count, int width, int height);
     std::string screenJson() const;
 
 private:

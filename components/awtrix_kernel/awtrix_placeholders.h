@@ -29,9 +29,9 @@
  *     wouldn't fit on the 32x8 matrix anyway.
  */
 
-bool        awtrix_placeholder_register(const std::string &topic);
-void        awtrix_placeholder_update(const std::string &topic, const std::string &value);
-bool        awtrix_placeholder_has(const std::string &topic);
-std::string awtrix_placeholder_get(const std::string &topic);
+bool awtrix_placeholder_register(const std::string& topic);
+void awtrix_placeholder_update(const std::string& topic, const std::string& value);
+bool awtrix_placeholder_has(const std::string& topic);
+std::string awtrix_placeholder_get(const std::string& topic);
 
 #endif /* __cplusplus */

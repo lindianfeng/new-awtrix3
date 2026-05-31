@@ -11,7 +11,7 @@ void awtrix_settings_init(void);
 
 /* ── Filesystem init ─────────────────────────────────────────── */
 bool awtrix_fs_mount(void);
-bool awtrix_fs_file_exists(const char *path);
+bool awtrix_fs_file_exists(const char* path);
 
 #ifdef __cplusplus
 }

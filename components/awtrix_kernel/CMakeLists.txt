@@ -25,12 +25,12 @@
 #   - freertos / esp_timer / log are transitively provided by IDF core.
 idf_component_register(
         SRCS "awtrix_command_bus.cpp"
-             "awtrix_apps.cpp"
-             "awtrix_display_snapshot.cpp"
-             "awtrix_query_snapshot.cpp"
-             "awtrix_protocol.cpp"
-             "awtrix_placeholders.cpp"
-             "awtrix_system_state.cpp"
+        "awtrix_apps.cpp"
+        "awtrix_display_snapshot.cpp"
+        "awtrix_query_snapshot.cpp"
+        "awtrix_protocol.cpp"
+        "awtrix_placeholders.cpp"
+        "awtrix_system_state.cpp"
         INCLUDE_DIRS "."
         REQUIRES awtrix_hal cjson
 )

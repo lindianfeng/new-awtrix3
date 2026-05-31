@@ -19,6 +19,6 @@
 # PRIV_REQUIRES (or REQUIRES if the symbol leaks through a public header).
 idf_component_register(
         SRCS "awtrix_icons.c"
-             "awtrix_dictionary.c"
+        "awtrix_dictionary.c"
         INCLUDE_DIRS "."
 )

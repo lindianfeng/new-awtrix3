@@ -15,6 +15,6 @@ class GifPlayer;
  * MenuOverlay role from src/Overlays.cpp in the original firmware. */
 using AwtrixMenuOverlayCallback = std::function<void(Matrix &, UiState &, GifPlayer *)>;
 
-const AwtrixMenuOverlayCallback &awtrix_menu_overlay();
+const AwtrixMenuOverlayCallback& awtrix_menu_overlay();
 
 #endif /* __cplusplus */

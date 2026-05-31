@@ -23,7 +23,7 @@ extern "C" {
  * full LZW decoder from src/GifPlayer.h; tracked as future work). Users
  * who need animated icons should send a customApp draw-instructions
  * payload instead. */
-bool awtrix_icon_load_rgb565(const char *name, uint16_t out_rgb565[64]);
+bool awtrix_icon_load_rgb565(const char* name, uint16_t out_rgb565[64]);
 
 #ifdef __cplusplus
 }

@@ -15,7 +15,7 @@ extern "C" {
 
 void awtrix_artnet_start(void);
 void awtrix_artnet_stop(void);
-bool awtrix_artnet_take_frame(uint32_t *rgb888, int max_pixels, int *out_pixels);
+bool awtrix_artnet_take_frame(uint32_t* rgb888, int max_pixels, int* out_pixels);
 
 #ifdef __cplusplus
 }

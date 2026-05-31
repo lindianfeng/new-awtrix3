@@ -1,6 +1,7 @@
 #include "awtrix_overlay_registry.h"
 
-std::vector<AwtrixOverlayCallback> awtrix_default_overlays() {
+std::vector<AwtrixOverlayCallback> awtrix_default_overlays()
+{
     /* Pack D: menu overlay sits at the top — when active it fills the
      * whole matrix with its label, hiding any app/notification underneath
      * (mirrors the role of MenuOverlay in src/Overlays.cpp). The status

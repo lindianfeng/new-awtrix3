@@ -25,9 +25,9 @@
 #include "awtrix_menumanager.h"
 #include <string>
 
-static const char *TAG = TAG_SYSTEM;
-static Matrix *s_matrix = nullptr;
-static AwtrixHttpServer *s_http = nullptr;
+static const char* TAG = TAG_SYSTEM;
+static Matrix* s_matrix = nullptr;
+static AwtrixHttpServer* s_http = nullptr;
 
 /* C-linkage forward declaration for the BUTTON_CALLBACK helper that lives
  * in awtrix_api.cpp; needed at file scope because extern "C" cannot appear
@@ -35,16 +35,19 @@ static AwtrixHttpServer *s_http = nullptr;
 extern "C" void awtrix_button_callback_fire(int idx, int evt);
 
 /* ── Button → DisplayManager / MenuManager bridge ─────────────── */
-static void onButton(int idx, btn_event_t evt) {
+static void onButton(int idx, btn_event_t evt)
+{
     /* Honour the user-toggled swap_buttons: when the device is mounted
      * upside-down the LEFT and RIGHT buttons must logically swap so
      * navigation feels natural. Mirrors the original AWTRIX3 behaviour. */
-    if (CONFIG.swap_buttons) {
-        if      (idx == BTN_LEFT)  idx = BTN_RIGHT;
+    if (CONFIG.swap_buttons)
+    {
+        if (idx == BTN_LEFT) idx = BTN_RIGHT;
         else if (idx == BTN_RIGHT) idx = BTN_LEFT;
     }
 
-    if (idx == BTN_RESET && evt == BTN_EVENT_VERY_LONG_PRESS) {
+    if (idx == BTN_RESET && evt == BTN_EVENT_VERY_LONG_PRESS)
+    {
         ESP_LOGI(TAG, "Factory reset triggered");
         AwtrixConfig::get().eraseAll();
         esp_restart();
@@ -53,15 +56,21 @@ static void onButton(int idx, btn_event_t evt) {
     /* Mirror to MQTT binary_sensor for HA. PRESSED / RELEASED states
      * match the discovery payload published by awtrix_mqtt_publish_ha_discovery. */
     if (evt == BTN_EVENT_PRESSED || evt == BTN_EVENT_LONG_PRESS ||
-        evt == BTN_EVENT_DOUBLE_PRESS || evt == BTN_EVENT_VERY_LONG_PRESS) {
-        const char *topic = nullptr;
-        switch (idx) {
-            case BTN_LEFT:   topic = "stats/btn_left";   break;
-            case BTN_SELECT: topic = "stats/btn_select"; break;
-            case BTN_RIGHT:  topic = "stats/btn_right";  break;
-            default: break;
+        evt == BTN_EVENT_DOUBLE_PRESS || evt == BTN_EVENT_VERY_LONG_PRESS)
+    {
+        const char* topic = nullptr;
+        switch (idx)
+        {
+        case BTN_LEFT: topic = "stats/btn_left";
+            break;
+        case BTN_SELECT: topic = "stats/btn_select";
+            break;
+        case BTN_RIGHT: topic = "stats/btn_right";
+            break;
+        default: break;
         }
-        if (topic) {
+        if (topic)
+        {
             awtrix_mqtt_publish(topic, "PRESSED");
             /* Fire the user-configured BUTTON_CALLBACK URL (if any). The
              * extern "C" prototype lives at file scope. */
@@ -69,7 +78,8 @@ static void onButton(int idx, btn_event_t evt) {
         }
     }
 
-    if (evt == BTN_EVENT_PRESSED) {
+    if (evt == BTN_EVENT_PRESSED)
+    {
         AwtrixCommand command;
         command.type = AwtrixCommandType::Button;
         command.source = AWTRIX_COMMAND_SOURCE_BUTTON;
@@ -77,15 +87,18 @@ static void onButton(int idx, btn_event_t evt) {
         else if (idx == BTN_SELECT) command.index = 1;
         else if (idx == BTN_RIGHT) command.index = 2;
         else return;
-        if (!awtrix_command_bus_post(command, 0)) ESP_LOGW(TAG, "Dropped button command idx=%d", idx);
+        if (!awtrix_command_bus_post(command, 0))
+            ESP_LOGW(TAG, "Dropped button command idx=%d", idx);
     }
 
-    if (idx == BTN_SELECT && evt == BTN_EVENT_LONG_PRESS) {
+    if (idx == BTN_SELECT && evt == BTN_EVENT_LONG_PRESS)
+    {
         AwtrixCommand command;
         command.type = AwtrixCommandType::Button;
         command.source = AWTRIX_COMMAND_SOURCE_BUTTON;
         command.index = 3;
-        if (!awtrix_command_bus_post(command, 0)) ESP_LOGW(TAG, "Dropped button long-press command");
+        if (!awtrix_command_bus_post(command, 0))
+            ESP_LOGW(TAG, "Dropped button long-press command");
     }
 }
 
@@ -101,7 +114,7 @@ extern "C" void app_main(void)
 
     /* ── 3. NVS + Config ────────────────────────────────────── */
     awtrix_settings_init();
-    auto &cfg = AwtrixConfig::get();
+    auto& cfg = AwtrixConfig::get();
     cfg.load();
 
     /* Cross-task command bus: HTTP/MQTT/button producers enqueue commands,
@@ -117,7 +130,8 @@ extern "C" void app_main(void)
         MATRIX_WIDTH, MATRIX_HEIGHT, 4, 1,
         NEO_MATRIX_TOP | NEO_MATRIX_LEFT | NEO_MATRIX_ROWS | MATRIX_TYPE
     );
-    if (!s_matrix || !s_matrix->getLeds()) {
+    if (!s_matrix || !s_matrix->getLeds())
+    {
         ESP_LOGE(TAG, "Matrix alloc failed — halting");
         for (;;) vTaskDelay(pdMS_TO_TICKS(1000));
     }
@@ -130,7 +144,7 @@ extern "C" void app_main(void)
     s_matrix->show();
 
     /* ── 6. DisplayManager ──────────────────────────────────── */
-    auto &disp = DisplayManager::get();
+    auto& disp = DisplayManager::get();
     disp.setup(s_matrix);
     disp.loadNativeApps();
 
@@ -149,14 +163,16 @@ extern "C" void app_main(void)
 
     /* ── 9. Wait for Wi-Fi with progress animation ──────────── */
     int dot = 0;
-    while (!awtrix_wifi_is_ready()) {
+    while (!awtrix_wifi_is_ready())
+    {
         s_matrix->clear();
         s_matrix->setCursor(2, 1);
         s_matrix->setTextColor(Matrix::Color(0, 200, 0));
         s_matrix->print("AWTRIX");
         s_matrix->setCursor(4, 4);
         s_matrix->setTextColor(Matrix::Color(255, 255, 255));
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 4; i++)
+        {
             s_matrix->print(i <= (dot % 4) ? '.' : ' ');
         }
         s_matrix->show();
@@ -181,7 +197,7 @@ extern "C" void app_main(void)
      * MUST happen before HTTP/MQTT/TCP go live. Otherwise a fast inbound
      * request (or even a physical button press during boot) could hit a
      * nullptr onButtonEvent or an unwired EventBus slot. */
-    auto &peri = PeripheryManager::get();
+    auto& peri = PeripheryManager::get();
     peri.onButtonEvent = onButton;
     peri.setup();
     peri.playBootSound();
@@ -196,11 +212,11 @@ extern "C" void app_main(void)
      * flow that used to fan out through here (ShowSleepScreen / SetBrightness
      * / Notify) now goes straight to awtrix_command_bus_post() from the
      * producing module, removing main as a passive trampoline. */
-    auto &bus = AwtrixEventBus::get();
-    bus.onRtttlAction     = [](const char *r){ if (r) PeripheryManager::get().playRTTTL(r); };
-    bus.onSoundAction     = [](const char *j){ PeripheryManager::get().parseSound(j); };
-    bus.onR2D2Action      = [](const char *m){ if (m) PeripheryManager::get().r2d2(m); };
-    bus.onSetVolumeAction = [](uint8_t v)    { PeripheryManager::get().setVolume(v); };
+    auto& bus = AwtrixEventBus::get();
+    bus.onRtttlAction = [](const char* r) { if (r) PeripheryManager::get().playRTTTL(r); };
+    bus.onSoundAction = [](const char* j) { PeripheryManager::get().parseSound(j); };
+    bus.onR2D2Action = [](const char* m) { if (m) PeripheryManager::get().r2d2(m); };
+    bus.onSetVolumeAction = [](uint8_t v) { PeripheryManager::get().setVolume(v); };
     ESP_LOGI(TAG, "EventBus wired (4 immediate-action slots to periphery)");
 
     /* ── 14. Restore persisted custom apps from /spiffs/CUSTOMAPPS ── */
@@ -208,10 +224,13 @@ extern "C" void app_main(void)
 
     /* ── 15. HTTP server (Phase B — start exposing to the world) ── */
     s_http = new AwtrixHttpServer();
-    if (s_http->start(cfg.web_port)) {
+    if (s_http->start(cfg.web_port))
+    {
         awtrix_api_register_routes(*s_http);
         ESP_LOGI(TAG, "HTTP ready on :%d", cfg.web_port);
-    } else {
+    }
+    else
+    {
         ESP_LOGE(TAG, "HTTP server failed to start on :%d", cfg.web_port);
     }
 
@@ -227,13 +246,16 @@ extern "C" void app_main(void)
 
     /* ── 17. Show status on matrix ──────────────────────────── */
     s_matrix->clear();
-    if (awtrix_wifi_is_connected()) {
+    if (awtrix_wifi_is_connected())
+    {
         char info[48];
         snprintf(info, sizeof(info), "%s:%d", ipBuf, cfg.web_port);
         s_matrix->setCursor(0, 1);
         s_matrix->setTextColor(Matrix::Color(0, 255, 0));
         s_matrix->print(info);
-    } else {
+    }
+    else
+    {
         s_matrix->setCursor(0, 1);
         s_matrix->setTextColor(Matrix::Color(255, 165, 0));
         s_matrix->print("AP:AWTRIX3");
@@ -243,8 +265,9 @@ extern "C" void app_main(void)
 
     /* ── 18. Main loop (FreeRTOS rate-monotonic) ────────────── */
     TickType_t xLastWakeTime = xTaskGetTickCount();
-    uint32_t   tickCount      = 0;     /* ~62.5 Hz at 16 ms */
-    for (;;) {
+    uint32_t tickCount = 0; /* ~62.5 Hz at 16 ms */
+    for (;;)
+    {
         disp.tick();
         peri.tick();
         awtrix_mqtt_tick();
@@ -252,16 +275,19 @@ extern "C" void app_main(void)
         /* ~5 Hz: UDP discovery responder. The original ran this every
          * frame which is wasteful — discovery clients only re-scan a few
          * times per second. */
-        if ((tickCount % 12) == 0) {
+        if ((tickCount % 12) == 0)
+        {
             awtrix_udp_discovery_tick(cfg.hostname.c_str(), cfg.web_port);
         }
 
         /* ~1 Hz: New Year banner watcher (only fires within last 10 s of Dec 31). */
-        if ((tickCount % 64) == 0) {
+        if ((tickCount % 64) == 0)
+        {
             disp.checkNewYear();
         }
         /* ~0.2 Hz: re-publish current app to MQTT for HA's currentApp sensor. */
-        if ((tickCount % 320) == 0) {
+        if ((tickCount % 320) == 0)
+        {
             disp.sendAppLoop();
         }
 

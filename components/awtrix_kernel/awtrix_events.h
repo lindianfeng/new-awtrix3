@@ -41,33 +41,35 @@
  *   - They have no display-state side effects, so the command-bus
  *     serialisation guarantee that protects UI consistency isn't useful here.
  */
-struct AwtrixEventBus {
+struct AwtrixEventBus
+{
     /* ── Display → Periphery: immediate-action slots ─────────────
      * Filled in by main() after PeripheryManager::setup(). The display
      * layer uses these whenever a notification asks for sound/RTTTL/etc. */
-    std::function<void(const char *rtttl)>     onRtttlAction;     /* play RTTTL string */
-    std::function<void(const char *json)>      onSoundAction;     /* play DFPlayer sound (json: {"id":n}) */
-    std::function<void(const char *msg)>       onR2D2Action;      /* synthesize R2-D2-style buzzer beeps */
-    std::function<void(uint8_t v0_30)>         onSetVolumeAction; /* DFPlayer / buzzer volume */
+    std::function<void(const char* rtttl)> onRtttlAction; /* play RTTTL string */
+    std::function<void(const char* json)> onSoundAction; /* play DFPlayer sound (json: {"id":n}) */
+    std::function<void(const char* msg)> onR2D2Action; /* synthesize R2-D2-style buzzer beeps */
+    std::function<void(uint8_t v0_30)> onSetVolumeAction; /* DFPlayer / buzzer volume */
 
     /* ── Helpers (do nothing if slot is empty) ───────────────────
      * Inline so the optimizer can fully elide the call when the slot
      * is unset, exactly like a virtual call to a zero-impl shim. */
-    void rtttl(const char *r) const          { if (onRtttlAction)     onRtttlAction(r); }
-    void sound(const char *json) const       { if (onSoundAction)     onSoundAction(json); }
-    void r2d2(const char *msg) const         { if (onR2D2Action)      onR2D2Action(msg); }
-    void setVolume(uint8_t v) const          { if (onSetVolumeAction) onSetVolumeAction(v); }
+    void rtttl(const char* r) const { if (onRtttlAction) onRtttlAction(r); }
+    void sound(const char* json) const { if (onSoundAction) onSoundAction(json); }
+    void r2d2(const char* msg) const { if (onR2D2Action) onR2D2Action(msg); }
+    void setVolume(uint8_t v) const { if (onSetVolumeAction) onSetVolumeAction(v); }
 
     /* Meyer's singleton — thread-safe lazy init under C++11. */
-    static AwtrixEventBus &get() {
+    static AwtrixEventBus& get()
+    {
         static AwtrixEventBus instance;
         return instance;
     }
 
 private:
     AwtrixEventBus() = default;
-    AwtrixEventBus(const AwtrixEventBus &) = delete;
-    AwtrixEventBus &operator=(const AwtrixEventBus &) = delete;
+    AwtrixEventBus(const AwtrixEventBus&) = delete;
+    AwtrixEventBus& operator=(const AwtrixEventBus&) = delete;
 };
 
 /* Short alias used throughout the codebase: `EVENTS.rtttl(...)`. */

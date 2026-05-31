@@ -33,6 +33,22 @@ dependencies:
       registry_url: https://components.espressif.com
       type: service
     version: 1.1.1
+  espressif/esp_new_jpeg:
+    component_hash: e6af208a875abd0ecfc0213d3751a11b504b463ebde6930f24096047925fa5c1
+    dependencies: []
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    targets:
+    - esp32
+    - esp32s2
+    - esp32s3
+    - esp32p4
+    - esp32c2
+    - esp32c3
+    - esp32c5
+    - esp32c6
+    version: 0.6.1
   espressif/led_strip:
     component_hash: 28621486f77229aaf81c71f5e15d6fbf36c2949cf11094e07090593e659e7639
     dependencies:
@@ -70,10 +86,11 @@ dependencies:
 direct_dependencies:
 - espressif/button
 - espressif/cjson
+- espressif/esp_new_jpeg
 - espressif/led_strip
 - espressif/mdns
 - espressif/mqtt
 - idf
-manifest_hash: 95d693831941d4c30be40ae42163a9a14143785bf38b7c2f416b769ea09d3c5b
+manifest_hash: ab8bfba4491431ef33e7b24ae8c4e12051d2cca3a5f950a7c4fa648dabf57c92
 target: esp32s3
 version: 3.0.0
